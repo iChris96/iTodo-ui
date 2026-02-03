@@ -1,21 +1,17 @@
 import React from "react";
 import { ModeToggle } from "./components/theme-toggle";
 import TodoList from "./components/todos/todo-list";
+import UpdateTodoDialog from "./components/todos/todo-update-dialog";
 import { ThemeProvider } from "./providers/theme-provider";
 import type { Todo } from './types/todos';
 import { Input } from "./components/ui/input";
 import { Label } from "./components/ui/label";
 import { Button } from "./components/ui/button";
 
-const todos: Todo[] = [
-  { id: '1', title: 'Buy groceries', completed: false },
-  { id: '2', title: 'Buy groceries', completed: false },
-  { id: '3', title: 'Buy groceries', completed: false },
-];
-
 function App() {
-  const [todosItems, setTodosItems] = React.useState(todos)
+  const [todosItems, setTodosItems] = React.useState<Todo[]>([])
   const [todoText, setTodoText] = React.useState('')
+  const [editingTodo, setEditingTodo] = React.useState<Todo | null>(null)
 
   const onChangeText = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setTodoText(target.value);
@@ -41,6 +37,23 @@ function App() {
     setTodosItems(prevItems => prevItems.filter(todo => todo.id !== todoId))
   }
 
+  const onEditTodo = (todo: Todo) => {
+    setEditingTodo(todo)
+  }
+
+  const onCloseDialog = () => {
+    setEditingTodo(null)
+  }
+
+  const onSaveTodo = (todoId: string, newTitle: string) => {
+    setTodosItems(prev => prev.map(todo =>
+      todo.id === todoId
+        ? { ...todo, title: newTitle }
+        : todo
+    ))
+    setEditingTodo(null)
+  }
+
   return (
     <>
       <ThemeProvider>
@@ -57,7 +70,13 @@ function App() {
             </div>
           </Label>
 
-          <TodoList todos={todosItems} onDeleteTodo={onDeleteTodo} />
+          <TodoList todos={todosItems} onDeleteTodo={onDeleteTodo} onEditTodo={onEditTodo} />
+          <UpdateTodoDialog
+            todo={editingTodo}
+            isOpen={editingTodo !== null}
+            onClose={onCloseDialog}
+            onSave={onSaveTodo}
+          />
         </div>
         <ModeToggle />
       </ThemeProvider >
