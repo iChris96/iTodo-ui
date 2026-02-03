@@ -22,6 +22,10 @@ function App() {
   }
 
   const addTodo = () => {
+    if (todoText === '') {
+      return;
+    }
+
     const newTodo: Todo = { id: crypto.randomUUID(), completed: false, title: todoText }
     setTodosItems(prev => [...prev, newTodo]);
     setTodoText('');
@@ -31,6 +35,10 @@ function App() {
     if (key === 'Enter') {
       addTodo();
     }
+  }
+
+  const onDeleteTodo = (todoId: string) => {
+    setTodosItems(prevItems => prevItems.filter(todo => todo.id !== todoId))
   }
 
   return (
@@ -49,7 +57,7 @@ function App() {
             </div>
           </Label>
 
-          <TodoList todos={todosItems} />
+          <TodoList todos={todosItems} onDeleteTodo={onDeleteTodo} />
         </div>
         <ModeToggle />
       </ThemeProvider >
