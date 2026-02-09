@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Todo } from '@/types/todos';
 import { Trash2Icon } from 'lucide-react';
 import { Checkbox } from '../ui/checkbox';
@@ -7,9 +8,11 @@ interface Props {
     todo: Todo;
     onDeleteTodo: (todoId: string) => void;
     onEditTodo: (todo: Todo) => void;
+    onToggleComplete: (todoId: string) => void;
+
 }
 
-const TodoItem = ({ todo, onDeleteTodo, onEditTodo }: Props) => {
+const TodoItem = ({ todo, onDeleteTodo, onEditTodo, onToggleComplete }: Props) => {
     // const [checked, setChecked] = React.useState(false);
 
     const handleDeleteClick = (event: React.MouseEvent) => {
@@ -17,14 +20,20 @@ const TodoItem = ({ todo, onDeleteTodo, onEditTodo }: Props) => {
         onDeleteTodo(todo.id);
     };
 
-    const handleCheckboxClick = (event: React.MouseEvent) => {
+    const handleToggleComplete = React.useCallback((_checked: boolean) => {
+        onToggleComplete(todo.id);
+    }, [todo.id, onToggleComplete]);
+
+    const handleCheckboxClick = React.useCallback((event: React.MouseEvent) => {
         event.stopPropagation();
-    };
+    }, []);
 
     return (
-        <li key={todo.id} className="bg-brand flex justify-between items-center p-4 border-border border-3" onClick={() => onEditTodo(todo)}>
+        <li key={todo.id} className="bg-brand flex justify-between items-center p-4 border-border border-2" onClick={() => onEditTodo(todo)}>
             <Checkbox
                 className="bg-white data-[state=checked]:bg-white rounded-full w-8 h-8"
+                checked={todo.completed}
+                onCheckedChange={handleToggleComplete}
                 onClick={handleCheckboxClick}
             />
             <h4 >{todo.title}</h4>
